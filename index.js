@@ -7,17 +7,17 @@ app.use(express.json()) // this will make sure that the body we pass in req is u
 
 const users = []
 
-app.post("\signup" , function(req,res){
+app.post("/signup" , function(req,res){
 
 
     //this will parse the body
-    const username = req.body.username ;
-    const password = req.body.password;
+    const username = req.body.username 
+    const password = req.body.password
 
     //this will check wether the user is already signed up or not
     if(users.find(u => u.username === username)){
         res.json({
-            message: "you are already signed up"
+            "message": "you are already signed up"
         })
         return;
     }
@@ -29,13 +29,13 @@ app.post("\signup" , function(req,res){
     })
     //upon successfull signing up it will return this message
     res.json({
-        message: "you are signedIn"
+        "message": "you are signedIn"
     })
-
+console.log(users)
 
 })
 
-app.post("\signin" , function(req,res){
+app.post("/signin" , function(req,res){
 
     //passing user details in the body 
     const username = req.body.username
@@ -52,32 +52,31 @@ app.post("\signin" , function(req,res){
     res.json({
         token: token
     })
-
-    //if user is not found then return this message 
-    else {
-        res.json({
-            message: invalid username and password
-        })
-    }
 }
+else {
+    res.status(403).send({
+        message: "invalid username and password"
+    })
+}
+
     
 
 })
 
 
 //authenticted endpoints to check wether it is returning our token or not 
-app.get('\me' function (req,res){
-    const token = req.header.authorization
+app.get('/me', function(req,res){
+    const token = req.headers.token
     //
     //decoding token to know the real username 
     const decodedtoken = jwt.verify(token, JWT_SECRET)
     const username = decodedtoken.username
     
-    let founduser = users.find(u => u.token == token )
+    let founduser = users.find(u => u.username == username )
 
     if(founduser) {
         res.json({
-            username: founduser.username
+            username: founduser.username,
             password: founduser.password
         })
     }
