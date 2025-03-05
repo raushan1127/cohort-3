@@ -1,5 +1,7 @@
 const express = require("express")
 const app = express();
+const jwt = require('jsonwebtoken')
+const JWT_SECRET = 'randomraushansecret'
 
 app.use(express.json()) // this will make sure that the body we pass in req is understable by server 
 
@@ -34,7 +36,57 @@ app.post("\signup" , function(req,res){
 })
 
 app.post("\signin" , function(req,res){
+
+    //passing user details in the body 
+    const username = req.body.username
+    const password = req.body.password 
     
+    //checking if the passed user exist in our user database or in memory variable 
+    let founduser = users.find(u => u.username === username && u.password === password)
+
+    //if found user is true then alot a jwt to this user 
+    if(founduser) { 
+        const token = jwt.sign({
+        username: username
+    },JWT_SECRET)
+    res.json({
+        token: token
+    })
+
+    //if user is not found then return this message 
+    else {
+        res.json({
+            message: invalid username and password
+        })
+    }
+}
+    
+
+})
+
+
+//authenticted endpoints to check wether it is returning our token or not 
+app.get('\me' function (req,res){
+    const token = req.header.authorization
+    //
+    //decoding token to know the real username 
+    const decodedtoken = jwt.verify(token, JWT_SECRET)
+    const username = decodedtoken.username
+    
+    let founduser = users.find(u => u.token == token )
+
+    if(founduser) {
+        res.json({
+            username: founduser.username
+            password: founduser.password
+        })
+    }
+    else {
+        res.json ({
+            message: "token invalid"
+        })
+    }
+
 })
 
 app.listen(3000);//make sure that server is listening at this port
